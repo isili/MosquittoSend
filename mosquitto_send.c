@@ -302,7 +302,7 @@ int checkSleepTime(int sleeptime) {
 ------------------------------------------------------------------------------*/
 
 int main(int argc, char **argv){
-  char * filename = "/home/qualibit/Documenti/Qualidocs/mosquittoSend/cmds.txt";
+  char * filename = "mqtt_commands.txt";
   char * optcmd = NULL;
   char arg_firstpar[MINI_BUFFER_LENGTH] = "0";
   char incmd[BUFFER_LENGTH] = "";

@@ -1,0 +1,8 @@
+#Ignore commands in cmds.txt
+cmds.txt
+
+#Ignore object file 
+mosquitto_send.o
+
+#Ignore executable
+mosquitto_send
