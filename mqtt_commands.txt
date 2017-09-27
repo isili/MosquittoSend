@@ -1,0 +1,15 @@
+######
+# LED
+######
+led_config	led/%s/command/setConfig	"statustimer":"60"
+led_demo	led/%s/command/demo
+led_green	led/%s/command/green
+led_orange	led/%s/command/orange
+led_red	led/%s/command/red
+led_off	led/%s/command/off
+
+########
+# CLESS
+########
+hunt	cless/%s/command/hunt	"transactionid": "%s","amount": "0"
+
