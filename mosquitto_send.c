@@ -5,6 +5,47 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define DEFAULT_FILENAME "mqtt_commands.txt"
+#define DEFAULT_PREFIX "{\"data\":{%s}"
+#define DEFAULT_SUFFIX "\"timestamp\":\"20170623105756\"}"
+
+#define BUFFER_LENGTH 16384
+#define HALF_BUFFER_LENGTH 8192
+#define QUARTER_BUFFER_LENGTH 4096
+#define SMALL_BUFFER_LENGTH 1024
+#define MINI_BUFFER_LENGTH 128
+/*------------------------------------------------------------------------------
+                                    TO DO:
+-a, -b sostituiscono tutto es:
+
+/mosquitto_send -a PREFIX" -b _SUFFIX  -c hunt,11111111111111
+
+sleeptime -->: 0
+mosquitto_pub -t 'cless/0/command/hunt' -m '{"PREFIX_":{"transactionid": "11111111111111","amount": "0"}, "_SUFFIX":"20170623105756"}'
+
+
+
+/mosquitto_send -a PREFIX_ -b _SUFFIX  -c hunt,11111111111111
+
+sleeptime -->: 0
+mosquitto_pub -t 'cless/0/command/hunt' -m 'PREFIX_"transactionid": "11111111111111","amount": "0"_SUFFIX'
+
+Verifica anche il caso in cui -a '' -b '' (caso lecito)
+
+============= Makefile:
+
+install: mosquitto_send
+	install -D -m 755 mosquitto_send ${DESTDIR}/usr/bin/mosquitto_send
+
+
+invece di usare gcc, usare ${CC}, verificando che se non c'è la variabile CC, allora impostarla a "gcc"
+
+
+============== file .c
+
+mosquitto_send ===> stampa help
+
+------------------------------------------------------------------------------*/
 /*******************************************************************************
                                 LINKED LIST
 
@@ -113,13 +154,6 @@ void sort() {
 /*------------------------------------------------------------------------------
                                    UTILS
 ------------------------------------------------------------------------------*/
-
-#define BUFFER_LENGTH 16384
-#define HALF_BUFFER_LENGTH 8192
-#define QUARTER_BUFFER_LENGTH 4096
-#define SMALL_BUFFER_LENGTH 1024
-#define MINI_BUFFER_LENGTH 128
-
 //*********************************************************************************************************
 /*    @desc: check presence of prefix and suffix parameters
  *    @params:  prefix -- string of text
@@ -184,9 +218,9 @@ void addCmdToList(char *incommand, char *filename, char arg_firstpar[MINI_BUFFER
     char pref_aux[MINI_BUFFER_LENGTH] = "";
     char suff_aux[MINI_BUFFER_LENGTH] = "";
     int j = 1;
-    ( prefix[0] == '\0') ? (strncpy(pref_aux,"data", MINI_BUFFER_LENGTH)) : (strncpy(pref_aux, prefix, MINI_BUFFER_LENGTH));
-    ( suffix[0] == '\0') ? (strncpy(suff_aux,"timestamp", MINI_BUFFER_LENGTH)) : (strncpy(suff_aux, suffix, MINI_BUFFER_LENGTH));
-    sprintf(default_scndpar, "{\"%s\":{%s}, \"%s\":\"20170623105756\"}", pref_aux, "%s", suff_aux);
+    ( prefix[0] == '\0') ? (strncpy(pref_aux,DEFAULT_PREFIX, MINI_BUFFER_LENGTH)) : (strncpy(pref_aux, prefix, MINI_BUFFER_LENGTH));
+    ( suffix[0] == '\0') ? (strncpy(suff_aux,DEFAULT_SUFFIX, MINI_BUFFER_LENGTH)) : (strncpy(suff_aux, suffix, MINI_BUFFER_LENGTH));
+    sprintf(default_scndpar, "%s, %s", pref_aux, suff_aux);
     while ( (fgets(line,BUFFER_LENGTH,fp)) != NULL){
       if(line[0] == '#'){continue;}
       if(line[strlen(line)-1] == '\n'){
@@ -271,6 +305,7 @@ void printHelp() {
   printf("-- The program sends mosquitto commands along with data stored in a tab-delimited command file --\n");
   printf("Use: mosquitto_send [ARGUMENTS]\n");
   printf("  -f FILENAME       : change filename to FILENAME\n");
+  printf("                      default: %s\n", DEFAULT_FILENAME);
   printf("  -c COMMAND NAME   : search and execute given command/s\n");
   printf("  -s SLEEPTIME      : set given sleeptime between commands, default 0\n");
   printf("  -h HOST           : change default host mosquitto server to HOST\n");
@@ -290,10 +325,8 @@ void printHelp() {
 **********************************************************************************************************/
 
 int checkSleepTime(int sleeptime) {
-  if (sleeptime < 0 ){
-    sleeptime = 0;
-  }
-  printf("sleeptime -->: %d\n", sleeptime);
+  if (sleeptime < 0 ){sleeptime = 0;}
+  if (sleeptime != 0){printf("sleeptime -->: %d\n", sleeptime);}
   return sleeptime;
 }
 
@@ -302,7 +335,7 @@ int checkSleepTime(int sleeptime) {
 ------------------------------------------------------------------------------*/
 
 int main(int argc, char **argv){
-  char * filename = "mqtt_commands.txt";
+  char * filename = DEFAULT_FILENAME;
   char * optcmd = NULL;
   char arg_firstpar[MINI_BUFFER_LENGTH] = "0";
   char incmd[BUFFER_LENGTH] = "";
@@ -353,7 +386,6 @@ int main(int argc, char **argv){
             strncpy (suffix, optarg, HALF_BUFFER_LENGTH);
           break;
       default:
-      printHelp();
           break;
     }
   }
