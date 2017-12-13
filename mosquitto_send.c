@@ -49,7 +49,7 @@ mosquitto_send ===> stampa help
 /*******************************************************************************
                                 LINKED LIST
 
-/*    @desc: structure to handle the list of commands
+ *    @desc: structure to handle the list of commands
  *    @params:  key --> command name and params
  *              cmd --> argument 1
  *              data --> argument 2
@@ -184,7 +184,7 @@ bool checkPrefixSuffix(char prefix[HALF_BUFFER_LENGTH], char suffix[HALF_BUFFER_
 int countParms (char * prm, char * sep) {
   int count = 0;
   const char *tmp = prm;
-  while(tmp = strstr(tmp, sep))
+  while( (tmp = strstr(tmp, sep)) != NULL)
   {
      count++;
      tmp++;
@@ -206,7 +206,7 @@ void addCmdToList(char *incommand, char *filename, char arg_firstpar[MINI_BUFFER
       exit(-1);
     }
 
-    char line[BUFFER_LENGTH], *tl, *tok, *partok, seps[] = "\t";
+    char line[BUFFER_LENGTH], *tl, *partok, seps[] = "\t";
     char command[BUFFER_LENGTH] = "";
     char firstpar[QUARTER_BUFFER_LENGTH] = "";
     char temp_firstpar[QUARTER_BUFFER_LENGTH] = "";
@@ -247,7 +247,7 @@ void addCmdToList(char *incommand, char *filename, char arg_firstpar[MINI_BUFFER
           strncpy(scndpar, temp_scndpar, HALF_BUFFER_LENGTH);
         }
 
-        int i,cp = 1;
+        int i = 1;
         int numPrmsIncommand = 0;
         int numPrmsscndpar = 0;
         numPrmsIncommand = countParms(incommand, ",");
@@ -386,6 +386,7 @@ int main(int argc, char **argv){
             strncpy (suffix, optarg, HALF_BUFFER_LENGTH);
           break;
       default:
+            printHelp();
           break;
     }
   }
